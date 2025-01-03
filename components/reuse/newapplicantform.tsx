@@ -7,6 +7,7 @@ import { Input } from "../ui/input"; // Import UI components for styling
 import ReuseButton from "./button";
 import { Checkbox } from "../ui/checkbox"; // You can change this to a headless UI component later
 import { usePostApplicant } from "@/hooks/use-post-applicant";
+import { useRefreshApplicants } from "@/hooks/use-refresh-applicant";
 
 const items = [
   { id: "Piano", label: "Piano" },
@@ -31,12 +32,14 @@ export function ProfileForm({
   InputComponent = Input,
   CheckboxComponent = Checkbox,
   ButtonComponent = ReuseButton,
+  
 }: {
   InputComponent?: React.ComponentType<any>;
   CheckboxComponent?: React.ComponentType<any>;
   ButtonComponent?: React.ComponentType<any>;
 }) {
-  const { postApplicant, loading, error, successMessage } = usePostApplicant(); // Use the custom hook
+  const { refetchApplicants } = useRefreshApplicants();
+  const { postApplicant, loading, error, successMessage } = usePostApplicant(); 
   const newApplicantForm = useForm<z.infer<typeof newApplicantFormSchema>>({
     resolver: zodResolver(newApplicantFormSchema),
     defaultValues: {
@@ -46,10 +49,10 @@ export function ProfileForm({
     },
   });
 
-  function onSubmit(values: z.infer<typeof newApplicantFormSchema>) {
+  const onSubmit = async (values: z.infer<typeof newApplicantFormSchema>) => {
     console.log("Submitting Applicant Data:", values);
-    postApplicant(values);
-  }
+    await postApplicant(values).then(() => refetchApplicants());
+  };
 
   return (
     <form onSubmit={newApplicantForm.handleSubmit(onSubmit)} className="space-y-8">

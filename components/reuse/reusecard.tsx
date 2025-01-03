@@ -36,7 +36,7 @@ export function CardWithForm({ users, onDelete }: CardWithFormProps) {
               <ReuseButton
                 title="X"
                 color="red"
-                onClick={() => onDelete(user.id)} // Delete applicant
+                onClick={() => onDelete(user.id)} 
               />
             </div>
           </CardHeader>

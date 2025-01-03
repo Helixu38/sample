@@ -1,4 +1,3 @@
-// ApplicantCard.tsx
 "use client";
 
 import {
@@ -15,7 +14,7 @@ interface ApplicantCardProps {
   onClose: () => void;
 }
 
-export function ApplicantCard({ onClose }: ApplicantCardProps) {
+export function NewApplicantCard({ onClose }: ApplicantCardProps) {
   return (
     <Card className="w-[350px] relative">
       {/* Close button */}
