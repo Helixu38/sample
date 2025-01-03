@@ -26,7 +26,7 @@ export const useApplicants = () => {
           throw new Error("Failed to fetch applicants");
         }
         const applicants: Applicant[] = await response.json();
-        setData(applicants);
+        setData(applicants); 
       } catch (err) {
         setError((err as Error).message || "An error occurred.");
       } finally {
@@ -35,6 +35,8 @@ export const useApplicants = () => {
     };
 
     fetchApplicants();
+
+
   }, []);
 
   return { data, loading, error };
