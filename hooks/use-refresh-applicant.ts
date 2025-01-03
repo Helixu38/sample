@@ -31,13 +31,13 @@ export const useRefreshApplicants = () => {
   };
 
   useEffect(() => {
-    refetchApplicants(); // Fetch applicants on initial load
+    refetchApplicants(); 
   }, []);
 
   return {
     applicants,
     loading,
     error,
-    refetchApplicants,  // Expose the refetch function
+    refetchApplicants,  
   };
 };

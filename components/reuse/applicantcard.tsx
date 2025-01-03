@@ -1,8 +1,8 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import { useDeleteApplicant } from "@/hooks/use-delete-applicant"; // Import the delete hook
+import { useDeleteApplicant } from "@/hooks/use-delete-applicant";
 import { useRefreshApplicants } from "@/hooks/use-refresh-applicant";
-import ReuseButton from "./button"; // Import your custom ReuseButton component
+import ReuseButton from "./button"; 
 
 const CardWithForm = dynamic(
   () => import("./reusecard").then((mod) => mod.CardWithForm),
@@ -11,14 +11,11 @@ const CardWithForm = dynamic(
 
 export const ApplicantList = () => {
   const { applicants, loading, error, refetchApplicants } = useRefreshApplicants(); 
-  const { deleteApplicant, loading: deleteLoading, error: deleteError, successMessage } = useDeleteApplicant();
-
-  // State for controlling the visibility of the confirmation dialog
+  const { deleteApplicant, successMessage } = useDeleteApplicant();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedApplicantId, setSelectedApplicantId] = useState<string | null>(null);
-
+  
   const handleDelete = async (id: string) => {
-    // Set the selected applicant ID and open the confirmation dialog
     setSelectedApplicantId(id);
     setIsDialogOpen(true);
   };
@@ -26,13 +23,13 @@ export const ApplicantList = () => {
   const confirmDelete = async () => {
     if (selectedApplicantId) {
       await deleteApplicant(Number(selectedApplicantId));
-      refetchApplicants(); // Refresh the list after deletion
-      setIsDialogOpen(false); // Close the dialog
+      refetchApplicants(); 
+      setIsDialogOpen(false); 
     }
   };
 
   const cancelDelete = () => {
-    setIsDialogOpen(false); // Close the dialog without deleting
+    setIsDialogOpen(false); 
   };
 
   if (loading) return <div>Loading...</div>;
@@ -54,7 +51,7 @@ export const ApplicantList = () => {
     culturalClasses: applicant.culturalClasses || [],
   }));
 
-  // Find the name of the selected applicant by ID
+
   const selectedApplicantName = selectedApplicantId
     ? applicants.find((applicant) => applicant.id.toString() === selectedApplicantId)?.name
     : null;

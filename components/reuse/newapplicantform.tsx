@@ -1,21 +1,20 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Input } from "../ui/input"; // Import UI components for styling
+import { Input } from "../ui/input"; 
 import ReuseButton from "./button";
-import { Checkbox } from "../ui/checkbox"; // You can change this to a headless UI component later
+import { Checkbox } from "../ui/checkbox"; 
 import { usePostApplicant } from "@/hooks/use-post-applicant";
 import { useRefreshApplicants } from "@/hooks/use-refresh-applicant";
 
-// Cultural classes options
 const items = [
   { id: "Piano", label: "Piano" },
   { id: "Martial Arts", label: "Martial Arts" },
 ] as const;
 
-// Full name should be capitalized and contain at least 2 words
 const capitalizeName = (name: string) => {
   const words = name.split(" ");
   if (words.length < 2) return false;
@@ -23,7 +22,6 @@ const capitalizeName = (name: string) => {
   return capitalizedWords.join(" ") === name;
 };
 
-// New applicant form validation schema
 const newApplicantFormSchema = z.object({
   name: z
     .string()
@@ -50,6 +48,7 @@ export function ProfileForm({
 }) {
   const { refetchApplicants } = useRefreshApplicants();
   const { postApplicant, loading, error, successMessage } = usePostApplicant();
+  const [submissionSuccess, setSubmissionSuccess] = useState(false);
 
   const newApplicantForm = useForm<z.infer<typeof newApplicantFormSchema>>({
     resolver: zodResolver(newApplicantFormSchema),
@@ -62,41 +61,42 @@ export function ProfileForm({
 
   const onSubmit = async (values: z.infer<typeof newApplicantFormSchema>) => {
     console.log("Submitting Applicant Data:", values);
-    await postApplicant(values).then(() => refetchApplicants());
+    await postApplicant(values);
+    setSubmissionSuccess(true); 
   };
+
+  useEffect(() => {
+    if (submissionSuccess) {
+      refetchApplicants();
+      setSubmissionSuccess(false); 
+    }
+  }, [submissionSuccess, refetchApplicants]);
 
   return (
     <form onSubmit={newApplicantForm.handleSubmit(onSubmit)} className="space-y-8">
-      {/* Name Field */}
       <div>
         <label>Name</label>
         <InputComponent placeholder="Full Name" {...newApplicantForm.register("name")} />
-        <br />
-        {/* Display error for name */}
         {newApplicantForm.formState.errors.name && (
           <span className="text-red-500">{newApplicantForm.formState.errors.name.message}</span>
         )}
       </div>
 
-      {/* Age Field */}
       <div>
         <label>Age</label>
         <InputComponent type="number" placeholder="Age" {...newApplicantForm.register("age")} />
-        <br />
-        {/* Display error for age */}
         {newApplicantForm.formState.errors.age && (
           <span className="text-red-500">{newApplicantForm.formState.errors.age.message}</span>
         )}
       </div>
 
-      {/* Classes Field */}
       <div>
         <label>Classes</label>
         {items.map((item) => (
           <div key={item.id}>
             <CheckboxComponent
               checked={newApplicantForm.watch("culturalClasses")?.includes(item.id)}
-              onChange={(checked) =>
+              onChange={(checked : boolean) =>
                 checked
                   ? newApplicantForm.setValue("culturalClasses", [
                       ...newApplicantForm.getValues("culturalClasses"),
@@ -111,7 +111,6 @@ export function ProfileForm({
             <label>{item.label}</label>
           </div>
         ))}
-        {/* Display error for cultural classes */}
         {newApplicantForm.formState.errors.culturalClasses && (
           <span className="text-red-500">
             {newApplicantForm.formState.errors.culturalClasses.message}
@@ -119,14 +118,12 @@ export function ProfileForm({
         )}
       </div>
 
-      {/* Submit Button */}
       <ButtonComponent
         title={loading ? "Submitting..." : "Submit"}
         color="green"
-        onClick={newApplicantForm.handleSubmit(onSubmit)} // Trigger form submission
+        onClick={newApplicantForm.handleSubmit(onSubmit)}
       />
       
-      {/* Display general error or success message */}
       {error && <div className="text-red-500">{error}</div>}
       {successMessage && <div className="text-green-500">{successMessage}</div>}
     </form>
