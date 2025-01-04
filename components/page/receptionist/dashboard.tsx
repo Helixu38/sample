@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ApplicantList } from "@/components/reuse/applicantcard";
 import ReuseButton from "@/components/reuse/button";
 import { NewApplicantCard } from "@/components/reuse/newapplicantcard";
+import NavigationBar from "@/components/reuse/navigationbar";
 
 export default function Dashboard() {
   const [showApplicantCard, setShowApplicantCard] = useState(false);
@@ -19,6 +20,7 @@ export default function Dashboard() {
 
   return (
     <div className="relative flex items-center justify-center min-h-screen">
+      <NavigationBar />
       <div>
         <h1 className="text-xl font-semibold mb-6 text-center">Community Center</h1>
         <ReuseButton title="Add" color="blue" onClick={toggleApplicantCard} />

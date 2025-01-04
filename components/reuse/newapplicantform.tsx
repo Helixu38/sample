@@ -60,9 +60,14 @@ export function ProfileForm({
   });
 
   const onSubmit = async (values: z.infer<typeof newApplicantFormSchema>) => {
-    console.log("Submitting Applicant Data:", values);
-    await postApplicant(values);
-    setSubmissionSuccess(true); 
+    try {
+      console.log("Submitting Applicant Data:", values);
+      await postApplicant(values);
+      setSubmissionSuccess(true); 
+    } catch(err){
+      console.error(`Error submitting the applicant : ${err}`)
+    }
+
   };
 
   useEffect(() => {
