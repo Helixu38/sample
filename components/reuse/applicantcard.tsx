@@ -2,7 +2,7 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import { useDeleteApplicant } from "@/hooks/use-delete-applicant";
 import { useRefreshApplicants } from "@/hooks/use-refresh-applicant";
-import ReuseButton from "./button"; 
+import ReuseButton from "./button";
 
 const CardWithForm = dynamic(
   () => import("./reusecard").then((mod) => mod.CardWithForm),
@@ -10,11 +10,15 @@ const CardWithForm = dynamic(
 );
 
 export const ApplicantList = () => {
-  const { applicants, loading, error, refetchApplicants } = useRefreshApplicants(); 
+  const [pageNo, setPageNo] = useState(0); // Track the current page number
+  const pageSize = 5; // Number of applicants per page
+
+  // Fetch applicants with pagination
+  const { applicants, loading, error, refetchApplicants } = useRefreshApplicants(pageNo, pageSize);
   const { deleteApplicant, successMessage } = useDeleteApplicant();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedApplicantId, setSelectedApplicantId] = useState<string | null>(null);
-  
+
   const handleDelete = async (id: string) => {
     setSelectedApplicantId(id);
     setIsDialogOpen(true);
@@ -23,13 +27,13 @@ export const ApplicantList = () => {
   const confirmDelete = async () => {
     if (selectedApplicantId) {
       await deleteApplicant(Number(selectedApplicantId));
-      refetchApplicants(); 
-      setIsDialogOpen(false); 
+      refetchApplicants(); // Refetch applicants after deleting
+      setIsDialogOpen(false);
     }
   };
 
   const cancelDelete = () => {
-    setIsDialogOpen(false); 
+    setIsDialogOpen(false);
   };
 
   if (loading) return <div>Loading...</div>;
@@ -51,37 +55,38 @@ export const ApplicantList = () => {
     culturalClasses: applicant.culturalClasses || [],
   }));
 
-
   const selectedApplicantName = selectedApplicantId
     ? applicants.find((applicant) => applicant.id.toString() === selectedApplicantId)?.name
     : null;
 
+  // Pagination controls
+  const handleNextPage = () => setPageNo((prev) => prev + 1);
+  const handlePrevPage = () => setPageNo((prev) => (prev > 0 ? prev - 1 : 0));
+
   return (
     <div>
       {successMessage && <div className="text-green-500">{successMessage}</div>}
-      
+
       {/* Display confirmation dialog if it's open */}
       {isDialogOpen && selectedApplicantName && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-md">
             <h3>Are you sure you want to delete {selectedApplicantName}?</h3>
             <div className="flex justify-end space-x-4 mt-4">
-              <ReuseButton
-                title="Cancel"
-                color="gray"
-                onClick={cancelDelete}
-              />
-              <ReuseButton
-                title="Confirm"
-                color="red"
-                onClick={confirmDelete}
-              />
+              <ReuseButton title="Cancel" color="gray" onClick={cancelDelete} />
+              <ReuseButton title="Confirm" color="red" onClick={confirmDelete} />
             </div>
           </div>
         </div>
       )}
 
       <CardWithForm users={formattedUsers} onDelete={handleDelete} />
+
+      {/* Pagination controls */}
+      <div className="mt-4 flex justify-between">
+        <ReuseButton title="Previous" color="gray" onClick={handlePrevPage} />
+        <ReuseButton title="Next" color="green" onClick={handleNextPage} />
+      </div>
     </div>
   );
 };

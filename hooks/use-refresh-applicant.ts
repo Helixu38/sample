@@ -8,17 +8,17 @@ type Applicant = {
   culturalClasses: string[];
 };
 
-export const useRefreshApplicants = () => {
+export const useRefreshApplicants = (pageNo: number, pageSize: number) => {
   const [applicants, setApplicants] = useState<Applicant[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Function to fetch applicants
+  // Function to fetch applicants with pagination
   const refetchApplicants = async () => {
     setLoading(true);
     try {
-      const applicantsData = await fetchApplicants();
-      setApplicants(applicantsData.content);
+      const applicantsData = await fetchApplicants(pageNo, pageSize);
+      setApplicants(applicantsData.content); // assuming 'content' is the array of applicants
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
@@ -31,13 +31,13 @@ export const useRefreshApplicants = () => {
   };
 
   useEffect(() => {
-    refetchApplicants(); 
-  }, []);
+    refetchApplicants(); // Fetch applicants when pageNo or pageSize changes
+  }, [pageNo, pageSize]);
 
   return {
     applicants,
     loading,
     error,
-    refetchApplicants,  
+    refetchApplicants,
   };
 };
