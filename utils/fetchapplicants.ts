@@ -1,5 +1,5 @@
-export const fetchApplicants = async (pageNo: number, pageSize: number) => {
-  const API_URL = `http://localhost:8081/applicant?pageNo=${pageNo}&pageSize=${pageSize}`;
+export const fetchApplicants = async (pageNo: number, pageSize: number, keyword: string) => {
+  const API_URL = `http://localhost:8081/applicant?pageNo=${pageNo}&pageSize=${pageSize}&keyword=${keyword}`;
 
   try {
     const response = await fetch(API_URL);

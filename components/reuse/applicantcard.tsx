@@ -12,9 +12,10 @@ const CardWithForm = dynamic(
 export const ApplicantList = () => {
   const [pageNo, setPageNo] = useState(0); // Track the current page number
   const pageSize = 5; // Number of applicants per page
+  const [keyword, setKeyword] = useState(""); // Track the search keyword
 
-  // Fetch applicants with pagination
-  const { applicants, loading, error, refetchApplicants } = useRefreshApplicants(pageNo, pageSize);
+  // Fetch applicants with pagination and search
+  const { applicants, loading, error, refetchApplicants } = useRefreshApplicants(pageNo, pageSize, keyword);
   const { deleteApplicant, successMessage } = useDeleteApplicant();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedApplicantId, setSelectedApplicantId] = useState<string | null>(null);
@@ -34,6 +35,10 @@ export const ApplicantList = () => {
 
   const cancelDelete = () => {
     setIsDialogOpen(false);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setKeyword(e.target.value); // Update the search keyword
   };
 
   if (loading) return <div>Loading...</div>;
@@ -66,6 +71,17 @@ export const ApplicantList = () => {
   return (
     <div>
       {successMessage && <div className="text-green-500">{successMessage}</div>}
+
+      {/* Search Bar */}
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search applicants..."
+          value={keyword}
+          onChange={handleSearchChange}
+          className="border p-2 w-full"
+        />
+      </div>
 
       {/* Display confirmation dialog if it's open */}
       {isDialogOpen && selectedApplicantName && (
